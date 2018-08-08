@@ -1,1 +1,1 @@
-# react_bulletin_board
+Building a Bulletin Board using React
