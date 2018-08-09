@@ -4,22 +4,40 @@ import { FaPlus } from 'react-icons/fa';
 
 class Board extends Component {
   constructor(props) {
-    super();
+    super(props);
     this.state = {
       notes: []
     };
     this.add = this.add.bind(this);
     this.eachNote = this.eachNote.bind(this);
-    this.updateText = this.updateText.bind(this);
+    this.update = this.update.bind(this);
     this.remove = this.remove.bind(this);
     this.nextId = this.nextId.bind(this);
   }
+
+  componentWillMount() {
+    var self = this;
+    if (this.props.count) {
+      fetch(
+        `https://baconipsum.com/api/?type=all-meat&sentences=${
+          this.props.count
+        }`
+      )
+        .then(response => response.json())
+        .then(json =>
+          json[0]
+            .split('. ')
+            .forEach(sentence => self.add(sentence.substring(0, 25)))
+        );
+    }
+  }
+
   add(text) {
     this.setState(prevState => ({
       notes: [
         ...prevState.notes,
         {
-          id: this.nextId,
+          id: this.nextId(),
           note: text
         }
       ]
@@ -31,7 +49,7 @@ class Board extends Component {
     return this.uniqueId++;
   }
 
-  updateText(newText, i) {
+  update(newText, i) {
     console.log('updating item at index ', i, newText);
     this.setState(prevState => ({
       notes: prevState.notes.map(
@@ -47,7 +65,12 @@ class Board extends Component {
   }
   eachNote(note, i) {
     return (
-      <Note key={i} index={i} onChange={this.updateText} onRemove={this.remove}>
+      <Note
+        key={note.id}
+        index={note.id}
+        onChange={this.update}
+        onRemove={this.remove}
+      >
         {note.note}
       </Note>
     );
